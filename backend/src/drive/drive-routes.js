@@ -2,6 +2,7 @@ const express = require("express");
 const driveController = require("./drive-controller");
 const router = express.Router();
 const multer = require("multer");
+const fs = require("fs");
 
 // //get
 // // router.get("/", driveController.getList);
@@ -10,7 +11,16 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "/uploads"));
+    const uploadFolder = path.join(__dirname, "/uploads");
+
+    // Check if the upload folder exists, if not, create it
+    fs.mkdir(uploadFolder, { recursive: true }, (err) => {
+      if (err) {
+        console.error("Error creating upload folder:", err);
+        return cb(err);
+      }
+      cb(null, uploadFolder);
+    });
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname); // Use the original file name
