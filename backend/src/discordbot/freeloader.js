@@ -12,8 +12,6 @@ const client = new Client({
     IntentsBitField.Flags.MessageContent,
   ],
 });
-//testing code
-//-----------------------------------------------------
 
 const MAX_CHUNK_SIZE = 25 * 1024 * 1024;
 
@@ -51,7 +49,7 @@ async function uploadFileInChunksAndDelete(
 
     // Delete the original file after successful upload
     fs.unlinkSync(filePath);
-    console.log(uploadedUrls);
+    // console.log(uploadedUrls);
     return uploadedUrls;
   } catch (error) {
     console.error("Error uploading file:", error);
@@ -88,8 +86,6 @@ async function readFileAsBuffer(filePath) {
     return null;
   }
 }
-
-//----------------------------------------------------------
 
 //sends the file
 // async function sendFile(filePath, fileName) {
