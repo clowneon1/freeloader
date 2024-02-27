@@ -1,0 +1,8 @@
+{
+  "_id": "String",
+  "name": "String",
+  "date": "Date",
+  "size": "String",
+  "extesion": ".jpg",
+  "fileUrls": ["url1", "url2"]
+}

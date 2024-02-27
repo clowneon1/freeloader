@@ -1,8 +1,9 @@
 require("dotenv").config();
 const freeloader = require("../discordbot/freeloader");
+const FileProperties = require("../schema/file-properties");
 const destinationChannelId = process.env.CHANNEL_ID;
 
-const upload = async (req, res) => {
+upload = async (req, res) => {
   try {
     const files = req.files; // an array of all the files that were uploaded
 
@@ -11,14 +12,16 @@ const upload = async (req, res) => {
       const file = files[i];
 
       // Assuming you have a function to send file to Discord bot named 'sendFileToDiscordBot'
-      // console.log(`${file.destination} \ ${file.filename}`);
+      // console.log(`${file.size} \ ${file.filename}`);
+
       const filePath = file.destination + "\\" + file.filename;
-      console.log(filePath);
+      console.log(`${filePath} is processing right now`);
       const uploadUrls = await freeloader.uploadFileInChunksAndDelete(
         filePath,
         file.filename,
         destinationChannelId
       );
+      putFilePropertiesInDB(file.filename, getFileSize(file), uploadUrls);
     }
 
     console.log("All files sent to Discord bot successfully.");
@@ -26,6 +29,38 @@ const upload = async (req, res) => {
   } catch (error) {
     console.error("Error sending files to Discord bot:", error);
     return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const getFileSize = (file) => {
+  let fileSize;
+  if (file.size >= 1000000000) {
+    fileSize = `${(file.size / 1000000000).toFixed(2)} GB`;
+  } else if (file.size >= 1000000) {
+    fileSize = `${(file.size / 1000000).toFixed(2)} MB`;
+  } else if (file.size >= 1000) {
+    fileSize = `${(file.size / 1000).toFixed(2)} KB`;
+  } else {
+    fileSize = `${file.size} bytes`;
+  }
+  return fileSize;
+};
+
+const putFilePropertiesInDB = async (name, size, fileUrls) => {
+  try {
+    const date = Date.now();
+    const fileProperties = new FileProperties({
+      name,
+      size,
+      date,
+      fileUrls,
+    });
+    await fileProperties.save();
+    console.info(`File properties are uploaded to database sucessfully`);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while creating the joke." });
   }
 };
 
