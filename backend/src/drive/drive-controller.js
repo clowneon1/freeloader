@@ -1,7 +1,15 @@
 require("dotenv").config();
+const { default: mongoose } = require("mongoose");
 const freeloader = require("../discordbot/freeloader");
 const FileProperties = require("../schema/file-properties");
 const destinationChannelId = process.env.CHANNEL_ID;
+
+getFilesProperties = async (req, res) => {
+  const filesProps = await FileProperties.find({});
+  console.log(filesProps);
+  console.log("returning");
+  return res.status(200).json(filesProps);
+};
 
 upload = async (req, res) => {
   try {
@@ -21,7 +29,7 @@ upload = async (req, res) => {
         file.filename,
         destinationChannelId
       );
-      putFilePropertiesInDB(file.filename, getFileSize(file), uploadUrls);
+      putFilePropertiesInDB(file.filename, file.size, uploadUrls);
     }
 
     console.log("All files sent to Discord bot successfully.");
@@ -30,20 +38,6 @@ upload = async (req, res) => {
     console.error("Error sending files to Discord bot:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
-};
-
-const getFileSize = (file) => {
-  let fileSize;
-  if (file.size >= 1000000000) {
-    fileSize = `${(file.size / 1000000000).toFixed(2)} GB`;
-  } else if (file.size >= 1000000) {
-    fileSize = `${(file.size / 1000000).toFixed(2)} MB`;
-  } else if (file.size >= 1000) {
-    fileSize = `${(file.size / 1000).toFixed(2)} KB`;
-  } else {
-    fileSize = `${file.size} bytes`;
-  }
-  return fileSize;
 };
 
 const putFilePropertiesInDB = async (name, size, fileUrls) => {
@@ -66,4 +60,5 @@ const putFilePropertiesInDB = async (name, size, fileUrls) => {
 
 module.exports = {
   upload,
+  getFilesProperties,
 };
