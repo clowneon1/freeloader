@@ -26,6 +26,9 @@
 .file-list-table th {
   background-color: black;
 }
+.total-files {
+  margin-top: 10px;
+}
 
 .download-btn {
   padding: 6px 12px;
@@ -38,23 +41,4 @@
 
 .download-btn:hover {
   background-color: #45a049;
-}
-.upload-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.upload-btn {
-  margin-left: 10px;
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.upload-btn:hover {
-  background-color: #0056b3;
 }
