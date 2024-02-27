@@ -1,4 +1,6 @@
+require("dotenv").config();
 const freeloader = require("../discordbot/freeloader");
+const destinationChannelId = process.env.CHANNEL_ID;
 
 const upload = async (req, res) => {
   try {
@@ -12,7 +14,11 @@ const upload = async (req, res) => {
       // console.log(`${file.destination} \ ${file.filename}`);
       const filePath = file.destination + "\\" + file.filename;
       console.log(filePath);
-      await freeloader.sendFile(filePath, file.filename);
+      const uploadUrls = await freeloader.uploadFileInChunksAndDelete(
+        filePath,
+        file.filename,
+        destinationChannelId
+      );
     }
 
     console.log("All files sent to Discord bot successfully.");
