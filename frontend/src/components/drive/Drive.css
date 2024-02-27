@@ -1,0 +1,60 @@
+.drive-container {
+  margin: 20px;
+}
+
+.file-list-container {
+  margin-top: 20px;
+}
+
+.file-list-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.file-list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.file-list-table th,
+.file-list-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.file-list-table th {
+  background-color: black;
+}
+
+.download-btn {
+  padding: 6px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background-color: #45a049;
+}
+.upload-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.upload-btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.upload-btn:hover {
+  background-color: #0056b3;
+}

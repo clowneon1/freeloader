@@ -1,0 +1,74 @@
+/* CSS for UploadComponent */
+
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+}
+
+.file-input {
+  margin-bottom: 20px;
+  width: 80%;
+  max-width: 300px;
+}
+.upload-container {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-container:hover {
+  background-color: #0056b3;
+}
+
+.upload-container span {
+  margin-left: 10px;
+}
+
+.total-files {
+  margin-top: 10px;
+}
+
+/* Hide the default file input */
+.hidden {
+  display: none;
+}
+
+/* Center the "Choose files" text */
+.upload-container label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.total-files {
+  margin-left: 10px;
+}
+.upload-button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #0b7dda;
+}
+
+/* Styles for UploadFileList can go here */
+
+@media screen and (min-width: 768px) {
+  .upload-container {
+    max-width: 600px;
+    margin: 20px auto;
+  }
+}
