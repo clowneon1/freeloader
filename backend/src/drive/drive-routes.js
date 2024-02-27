@@ -5,7 +5,7 @@ const multer = require("multer");
 const fs = require("fs");
 
 // //get
-// // router.get("/", driveController.getList);
+router.get("/drive", driveController.getFilesProperties);
 
 const path = require("path");
 
