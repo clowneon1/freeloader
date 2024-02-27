@@ -7,6 +7,9 @@ const UploadComponent = () => {
   const [files, setFiles] = useState([]);
   const [totalFiles, setTotalFiles] = useState(0);
   const [uploadProgress, setUploadProgress] = useState([]);
+  const GB_CONVERSION = 1000000000;
+  const MB_CONVERSION = 1000000;
+  const KB_CONVERSION = 1000;
 
   const handleFileUpload = (event) => {
     const uploadedFiles = event.target.files;
@@ -18,12 +21,12 @@ const UploadComponent = () => {
       if (!fileNamesSet.has(file.name)) {
         // Check if file is not already in the list
         let fileSize;
-        if (file.size >= 1000000000) {
-          fileSize = `${(file.size / 1000000000).toFixed(2)} GB`;
-        } else if (file.size >= 1000000) {
-          fileSize = `${(file.size / 1000000).toFixed(2)} MB`;
-        } else if (file.size >= 1000) {
-          fileSize = `${(file.size / 1000).toFixed(2)} KB`;
+        if (file.size >= GB_CONVERSION) {
+          fileSize = `${(file.size / GB_CONVERSION).toFixed(2)} GB`;
+        } else if (file.size >= MB_CONVERSION) {
+          fileSize = `${(file.size / MB_CONVERSION).toFixed(2)} MB`;
+        } else if (file.size >= KB_CONVERSION) {
+          fileSize = `${(file.size / KB_CONVERSION).toFixed(2)} KB`;
         } else {
           fileSize = `${file.size} bytes`;
         }
