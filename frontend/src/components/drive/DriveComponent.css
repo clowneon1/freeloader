@@ -1,9 +1,10 @@
 .drive-container {
-  margin: 20px;
+  margin: 2% 5%; /* Adjust margins for responsiveness */
 }
 
 .file-list-container {
-  margin-top: 20px;
+  margin-top: 2%; /* Adjust top margin for responsiveness */
+  overflow-x: auto; /* Add horizontal scrolling */
 }
 
 .file-list-title {
@@ -26,6 +27,7 @@
 .file-list-table th {
   background-color: black;
 }
+
 .total-files {
   margin-top: 10px;
 }
@@ -41,4 +43,14 @@
 
 .download-btn:hover {
   background-color: #45a049;
+}
+
+@media screen and (max-width: 768px) {
+  .drive-container {
+    margin: 2% 2%; /* Adjust margins for smaller screens */
+  }
+
+  .file-list-container {
+    margin-top: 2%; /* Adjust top margin for smaller screens */
+  }
 }

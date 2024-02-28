@@ -6,8 +6,7 @@ const destinationChannelId = process.env.CHANNEL_ID;
 
 getFilesProperties = async (req, res) => {
   const filesProps = await FileProperties.find({});
-  console.log(filesProps);
-  console.log("returning");
+  console.log("returning AllFilesProperties");
   return res.status(200).json(filesProps);
 };
 
