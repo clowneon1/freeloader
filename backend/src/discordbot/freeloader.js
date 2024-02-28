@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { Client, IntentsBitField } = require("discord.js");
-const crypto = require("crypto");
 const token = process.env.TOKEN;
+const encdec = require("../encdec/encdec");
 
 const client = new Client({
   intents: [
@@ -14,11 +14,11 @@ const client = new Client({
 
 const MAX_CHUNK_SIZE = 25 * 1024 * 1024;
 
-async function uploadFileInChunksAndDelete(
+const uploadFileInChunksAndDelete = async (
   filePath,
   fileName,
   destinationChannelId
-) {
+) => {
   try {
     // Read the file as binary
     const destinationChannel = client.channels.cache.get(destinationChannelId);
@@ -30,10 +30,11 @@ async function uploadFileInChunksAndDelete(
     let startByte = 0;
     let endByte = MAX_CHUNK_SIZE;
     const uploadedUrls = [];
-    const encfile = encryptChunk(file);
+    // const encfile = await encdec.encryptFile(file);
+
     for (let i = 0; i < totalChunks; i++) {
-      const chunk = encfile.slice(startByte, endByte);
-      const _filename = fileName.split(".")[0] + "_" + i + ".txt";
+      const chunk = file.slice(startByte, endByte);
+      const _filename = fileName.split(".")[0] + "_" + i + ".enc";
 
       console.log(`pushing to discord: ${i + 1}/${totalChunks}: ${_filename}`);
 
@@ -57,9 +58,9 @@ async function uploadFileInChunksAndDelete(
     console.error("Error uploading file:", error);
     return null;
   }
-}
+};
 
-async function sendFileToDiscord(destinationChannel, file, fileName) {
+const sendFileToDiscord = async (destinationChannel, file, fileName) => {
   const message = await destinationChannel.send({
     files: [
       {
@@ -76,9 +77,9 @@ async function sendFileToDiscord(destinationChannel, file, fileName) {
     console.error("No attachments found in the sent message.");
     return null;
   }
-}
+};
 
-async function readFileAsBuffer(filePath) {
+const readFileAsBuffer = async (filePath) => {
   try {
     // Read the file as binary
     const fileContent = await fs.promises.readFile(filePath);
@@ -87,22 +88,7 @@ async function readFileAsBuffer(filePath) {
     console.error("Error reading file as buffer:", error);
     return null;
   }
-}
-
-function encryptChunk(content) {
-  const encryptionKey = process.env.ENCRYPTION_KEY;
-  // console.log(`${encryptionKey}`);
-  const iv = Buffer.from(process.env.IV, "hex"); // Generate a random IV (Initialization Vector)
-  // console.log(`${iv}`);
-  const cipher = crypto.createCipheriv(
-    "aes-256-ctr",
-    Buffer.from(encryptionKey, "hex"),
-    iv
-  );
-  let encryptedContent = cipher.update(content, "utf8", "hex");
-  encryptedContent += cipher.final("hex");
-  return iv.toString("hex") + encryptedContent; // Prepend IV to the encrypted content
-}
+};
 
 client.on("ready", (c) => {
   console.log(`👀 ${c.user.tag} is online`);

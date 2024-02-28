@@ -1,17 +1,63 @@
 require("dotenv").config();
-const { default: mongoose } = require("mongoose");
 const freeloader = require("../discordbot/freeloader");
 const FileProperties = require("../schema/file-properties");
 const destinationChannelId = process.env.CHANNEL_ID;
+const axios = require("axios");
+const encdec = require("../encdec/encdec");
+const path = require("path");
+const fs = require("fs");
 
-getFilesProperties = async (req, res) => {
+const downloadFile = async (req, res) => {
+  console.log(`downloading files from the server`);
+  const fileId = req.params.id;
+  try {
+    const fileData = await FileProperties.findById(fileId);
+    const originalFilename = fileData.name;
+    console.log(originalFilename);
+    const fileUrls = fileData.fileUrls;
+    const fileChunks = [];
+    for (const url of fileUrls) {
+      const response = await axios.get(url, { responseType: "arraybuffer" });
+      fileChunks.push(response.data);
+    }
+    console.log(`stiching files`);
+    const stitchedBuffer = Buffer.concat(fileChunks);
+    const stitchedFile = path.join(__dirname, "stitchedFile.txt");
+    fs.writeFileSync(stitchedFile, stitchedBuffer);
+    // Decrypt the file
+    console.log(`decrypting file`);
+    console.log(stitchedFile);
+    // const decryptedFilePath = await encdec.decryptFile(stitchedFile);
+
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" + originalFilename
+    );
+    // Send the decrypted file as a response with the original filename
+    res.download(stitchedFile, originalFilename, (err) => {
+      if (err) {
+        console.error("Error sending file:", err);
+        res.status(500).send("Internal Server Error");
+      } else {
+        // Clean up decrypted file after response has been sent
+        fs.unlinkSync(stitchedFile);
+      }
+    });
+  } catch (error) {
+    console.error("Error downloading, stitching, and decoding files:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+// =========================
+
+const getFilesProperties = async (req, res) => {
   const filesProps = await FileProperties.find({});
-  console.log(filesProps);
-  console.log("returning");
+  // console.log(filesProps);
+  console.log(`returning fileprops`);
   return res.status(200).json(filesProps);
 };
 
-upload = async (req, res) => {
+const upload = async (req, res) => {
   try {
     const files = req.files; // an array of all the files that were uploaded
 
@@ -59,4 +105,5 @@ const putFilePropertiesInDB = async (name, size, fileUrls) => {
 module.exports = {
   upload,
   getFilesProperties,
+  downloadFile,
 };

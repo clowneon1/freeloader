@@ -5,6 +5,8 @@ const multer = require("multer");
 const fs = require("fs");
 
 // //get
+
+router.get("/download/:id", driveController.downloadFile);
 router.get("/drive", driveController.getFilesProperties);
 
 const path = require("path");
