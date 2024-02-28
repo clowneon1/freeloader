@@ -7,6 +7,7 @@ const UploadComponent = () => {
   const [files, setFiles] = useState([]);
   const [totalFiles, setTotalFiles] = useState(0);
   const [uploadProgress, setUploadProgress] = useState([]);
+  const [uploading, setUploading] = useState(false); // State to track upload status
   const GB_CONVERSION = 1000000000;
   const MB_CONVERSION = 1000000;
   const KB_CONVERSION = 1000;
@@ -51,10 +52,12 @@ const UploadComponent = () => {
   };
 
   const handleUpload = async () => {
-    if (files.length === 0) {
-      alert("Please select files to upload.");
+    if (files.length === 0 || uploading) {
+      // Prevent multiple uploads while uploading
       return;
     }
+
+    setUploading(true); // Set uploading state to true
 
     const formData = new FormData();
     files.forEach((file) => {
@@ -94,6 +97,8 @@ const UploadComponent = () => {
     } catch (error) {
       console.error("Error uploading files:", error);
       setUploadProgress([]);
+    } finally {
+      setUploading(false); // Set uploading state to false when upload completes or errors occur
     }
   };
 
@@ -115,9 +120,13 @@ const UploadComponent = () => {
         uploadProgress={uploadProgress}
         handleRemoveFile={handleRemoveFile}
       />
-      <button className="upload-container" onClick={handleUpload}>
-        Upload
-      </button>
+      {!uploading && ( // Only display the "Upload" button when not uploading
+        <button className="upload-container" onClick={handleUpload}>
+          Upload
+        </button>
+      )}
+      {uploading && <span>Uploading...</span>}{" "}
+      {/* Display "Uploading..." while uploading */}
     </div>
   );
 };

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import "./DriveComponent.css"; // Import CSS file for styling
 
 const FileList = ({ filesProperties, handleDownload }) => {
+  const [selectedFiles, setSelectedFiles] = useState({}); // State to track selected files
+  const [downloading, setDownloading] = useState(false); // State to track download status
+
   const GB_CONVERSION = 1000000000;
   const MB_CONVERSION = 1000000;
   const KB_CONVERSION = 1000;
@@ -28,6 +31,30 @@ const FileList = ({ filesProperties, handleDownload }) => {
     return fileSize;
   };
 
+  const handleCheckboxChange = (index) => {
+    setSelectedFiles((prevState) => {
+      return { ...prevState, [index]: !prevState[index] };
+    });
+  };
+
+  const handleDownloadSelected = () => {
+    const selectedFilesArray = Object.keys(selectedFiles).filter(
+      (key) => selectedFiles[key]
+    );
+    const filesToDownload = selectedFilesArray.map(
+      (index) => filesProperties[index]
+    );
+    setDownloading(true); // Set downloading state to true
+    Promise.all(filesToDownload.map((file) => handleDownload(file)))
+      .then(() => {
+        setDownloading(false); // Set downloading state to false when all downloads are completed
+      })
+      .catch((error) => {
+        console.error("Error downloading files:", error);
+        setDownloading(false); // Set downloading state to false if any error occurs during download
+      });
+  };
+
   return (
     <div className="file-list-container">
       <div>
@@ -46,7 +73,7 @@ const FileList = ({ filesProperties, handleDownload }) => {
             <th>Name</th>
             <th>Date</th>
             <th>Size</th>
-            <th>Action</th>
+            <th>Select</th>
           </tr>
         </thead>
         <tbody>
@@ -56,17 +83,23 @@ const FileList = ({ filesProperties, handleDownload }) => {
               <td>{fileProperties.date}</td>
               <td>{convertSize(fileProperties.size)}</td>
               <td>
-                <button
-                  className="download-btn"
-                  onClick={() => handleDownload(fileProperties)}
-                >
-                  Download
-                </button>
+                <input
+                  type="checkbox"
+                  checked={selectedFiles[index] || false}
+                  onChange={() => handleCheckboxChange(index)}
+                />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <button
+        className="download-btn"
+        onClick={handleDownloadSelected}
+        disabled={downloading} // Disable the button if downloading is in progress
+      >
+        {downloading ? "Downloading..." : "Download Selected"}
+      </button>
     </div>
   );
 };

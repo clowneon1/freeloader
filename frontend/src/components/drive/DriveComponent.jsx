@@ -16,15 +16,25 @@ const DriveComponent = () => {
     setFilesProperties(res.data);
   };
 
-  const handleDownload = (file) => {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownload = async (fileProperties) => {
+    try {
+      const response = await axios.get(`/download/${fileProperties._id}`, {
+        responseType: "blob",
+      });
+
+      const url = URL.createObjectURL(response.data);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileProperties.name; // or set a custom name if needed
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      // Handle error (e.g., show a message to the user)
+    }
   };
 
   return (
