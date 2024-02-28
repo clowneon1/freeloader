@@ -1,7 +1,6 @@
 const fs = require("fs");
 const { Client, IntentsBitField } = require("discord.js");
 const crypto = require("crypto");
-
 const token = process.env.TOKEN;
 
 const client = new Client({
@@ -31,17 +30,20 @@ async function uploadFileInChunksAndDelete(
     let startByte = 0;
     let endByte = MAX_CHUNK_SIZE;
     const uploadedUrls = [];
-
+    const encfile = encryptChunk(file);
     for (let i = 0; i < totalChunks; i++) {
-      const chunk = file.slice(startByte, endByte);
+      const chunk = encfile.slice(startByte, endByte);
       const _filename = fileName.split(".")[0] + "_" + i + ".txt";
+
+      console.log(`pushing to discord: ${i + 1}/${totalChunks}: ${_filename}`);
+
       const uploadedUrl = await sendFileToDiscord(
         destinationChannel,
-        chunk,
+        Buffer.from(chunk),
         _filename
       );
       uploadedUrls.push(uploadedUrl);
-
+      // console.log(`pushed to discord : ${i + 1}/${totalChunks}: ${_filename}`);
       // Move to the next chunk
       startByte = endByte;
       endByte = Math.min(startByte + MAX_CHUNK_SIZE, file.length);
@@ -87,47 +89,11 @@ async function readFileAsBuffer(filePath) {
   }
 }
 
-//sends the file
-// async function sendFile(filePath, fileName) {
-//   const destinationChannel = client.channels.cache.get(destinationChannelId);
-//   console.log(destinationChannelId);
-//   if (!destinationChannel) {
-//     console.error("Destination channel not found.");
-//     return;
-//   }
-
-//   try {
-//     if (!fs.existsSync(filePath)) {
-//       console.error("File not found:", filePath);
-//       return;
-//     }
-
-//     const fileContent = fs.readFileSync(filePath);
-//     const message = await destinationChannel.send({
-//       files: [
-//         {
-//           attachment: fileContent,
-//           name: path.basename(filePath), // Use the filename from the path
-//         },
-//       ],
-//     });
-
-//     if (message.attachments.size > 0) {
-//       const attachment = message.attachments.first();
-//       console.log("Download URL:", attachment.url);
-//     } else {
-//       console.error("No attachments found in the sent message.");
-//     }
-//   } catch (error) {
-//     console.error("Error occurred while sending file:", error);
-//   }
-// }
-
-function encryptContent(content) {
-  const encryptionKey = crypto.randomBytes(32).toString("hex");
-  console.log(`encryption key -- ${encryptionKey}`);
-  const iv = crypto.randomBytes(16); // Generate a random IV (Initialization Vector)
-  console.log(`iv -- ${iv}`);
+function encryptChunk(content) {
+  const encryptionKey = process.env.ENCRYPTION_KEY;
+  // console.log(`${encryptionKey}`);
+  const iv = Buffer.from(process.env.IV, "hex"); // Generate a random IV (Initialization Vector)
+  // console.log(`${iv}`);
   const cipher = crypto.createCipheriv(
     "aes-256-ctr",
     Buffer.from(encryptionKey, "hex"),

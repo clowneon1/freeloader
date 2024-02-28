@@ -52,9 +52,7 @@ const putFilePropertiesInDB = async (name, size, fileUrls) => {
     await fileProperties.save();
     console.info(`File properties are uploaded to database sucessfully`);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "An error occurred while creating the joke." });
+    console.log(error, "An error occurred while creating the File properties");
   }
 };
 
