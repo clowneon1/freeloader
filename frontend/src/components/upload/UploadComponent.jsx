@@ -54,6 +54,9 @@ const UploadComponent = () => {
   const handleUpload = async () => {
     if (files.length === 0 || uploading) {
       // Prevent multiple uploads while uploading
+      if (files.length === 0) {
+        alert("Please select files to upload.");
+      }
       return;
     }
 

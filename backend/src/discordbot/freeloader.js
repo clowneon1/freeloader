@@ -30,11 +30,11 @@ const uploadFileInChunksAndDelete = async (
     let startByte = 0;
     let endByte = MAX_CHUNK_SIZE;
     const uploadedUrls = [];
-    // const encfile = await encdec.encryptFile(file);
+    const encfile = await encdec.encryptFile(file);
 
     for (let i = 0; i < totalChunks; i++) {
-      const chunk = file.slice(startByte, endByte);
-      const _filename = fileName.split(".")[0] + "_" + i + ".enc";
+      const chunk = encfile.slice(startByte, endByte);
+      const _filename = fileName.split(".")[0] + "_" + i + ".txt";
 
       console.log(`pushing to discord: ${i + 1}/${totalChunks}: ${_filename}`);
 

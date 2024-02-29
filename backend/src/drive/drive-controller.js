@@ -15,6 +15,7 @@ const downloadFile = async (req, res) => {
     const originalFilename = fileData.name;
     console.log(originalFilename);
     const fileUrls = fileData.fileUrls;
+    // console.log(fileUrls);
     const fileChunks = [];
     for (const url of fileUrls) {
       const response = await axios.get(url, { responseType: "arraybuffer" });
@@ -27,7 +28,7 @@ const downloadFile = async (req, res) => {
     // Decrypt the file
     console.log(`decrypting file`);
     console.log(stitchedFile);
-    // const decryptedFilePath = await encdec.decryptFile(stitchedFile);
+    const decryptedFilePath = await encdec.decryptFile(stitchedFile);
 
     res.setHeader(
       "Content-Disposition",
@@ -40,7 +41,7 @@ const downloadFile = async (req, res) => {
         res.status(500).send("Internal Server Error");
       } else {
         // Clean up decrypted file after response has been sent
-        fs.unlinkSync(stitchedFile);
+        fs.unlinkSync(decryptedFilePath);
       }
     });
   } catch (error) {
@@ -52,9 +53,17 @@ const downloadFile = async (req, res) => {
 
 const getFilesProperties = async (req, res) => {
   const filesProps = await FileProperties.find({});
+  const _filesProps = filesProps.map((fileProp) => {
+    return {
+      _id: fileProp._id,
+      name: fileProp.name,
+      date: fileProp.date,
+      size: fileProp.size,
+    };
+  });
   // console.log(filesProps);
   console.log(`returning fileprops`);
-  return res.status(200).json(filesProps);
+  return res.status(200).json(_filesProps);
 };
 
 const upload = async (req, res) => {
@@ -68,17 +77,26 @@ const upload = async (req, res) => {
       // Assuming you have a function to send file to Discord bot named 'sendFileToDiscordBot'
       // console.log(`${file.size} \ ${file.filename}`);
 
-      const filePath = file.destination + "\\" + file.filename;
+      let filePath = file.destination + "\\" + file.filename;
       console.log(`${filePath} is processing right now`);
-      const uploadUrls = await freeloader.uploadFileInChunksAndDelete(
-        filePath,
-        file.filename,
-        destinationChannelId
-      );
-      putFilePropertiesInDB(file.filename, file.size, uploadUrls);
+      freeloader
+        .uploadFileInChunksAndDelete(
+          filePath,
+          file.filename,
+          destinationChannelId
+        )
+        .then((uploadUrls) => {
+          if (uploadUrls == null) throw new Error("Error while sending file");
+          putFilePropertiesInDB(file.filename, file.size, uploadUrls);
+          console.log("All files sent to Discord bot successfully.");
+        })
+        .catch((err) => {
+          console.log(`error putting fileproperties in db ${err}`);
+        })
+        .catch((err) => {
+          console.log(`error pushing files to discord ${err}`);
+        });
     }
-
-    console.log("All files sent to Discord bot successfully.");
     return res.json({ status: "files received and sent to Discord bot" });
   } catch (error) {
     console.error("Error sending files to Discord bot:", error);
