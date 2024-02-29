@@ -1,38 +1,32 @@
 const crypto = require("crypto");
-
+const { decrypt } = require("dotenv");
 const fs = require("fs");
 const secretKey = process.env.SECRET_KEY;
-const secretIv = process.env.SECRET_IV;
-const { pipeline } = require("stream");
-
+const algorithm = "aes-256-ctr";
 const key = crypto
-  .createHash("sha512")
-  .update(secretKey, "utf-8")
-  .digest("hex")
-  .substring(0, 32);
-const iv = crypto
-  .createHash("sha512")
-  .update(secretIv, "utf-8")
-  .digest("hex")
-  .substring(0, 16);
-
-const encriptionMethod = "AES-256-CBC";
+  .createHash("sha256")
+  .update(secretKey)
+  .digest("base64")
+  .substr(0, 32);
 
 const decryptFile = async (filePath) => {
   try {
     // Read the encrypted file
-    const encryptedContent = fs.readFileSync(filePath, "utf-8");
+    let encrypted = fs.readFileSync(filePath);
+    const iv = encrypted.slice(0, 16);
+    encrypted = encrypted.slice(16);
 
     // Create decipher instance
-    const decipher = crypto.createDecipheriv(encriptionMethod, key, iv);
+    const decipher = crypto.createDecipheriv(algorithm, key, iv);
 
     // Decrypt the content
-    let decryptedContent = decipher.update(encryptedContent, "base64", "utf-8");
-    decryptedContent += decipher.final("utf-8");
+    let decryptedContent = Buffer.concat([
+      decipher.update(encrypted),
+      decipher.final(),
+    ]);
 
     // Write the decrypted content back to the same file
     fs.writeFileSync(filePath, decryptedContent);
-
     console.log("File decrypted and saved successfully:", filePath);
     return filePath;
   } catch (error) {
@@ -41,11 +35,14 @@ const decryptFile = async (filePath) => {
   }
 };
 
-const encryptFile = async (content) => {
-  const cipher = crypto.createCipheriv(encriptionMethod, key, iv);
-  let encryptedContent = cipher.update(content, "utf8", "base64");
-  encryptedContent += cipher.final("base64");
-  return encryptedContent;
+const encryptFile = (buffer) => {
+  // Create an initialization vector
+  const iv = crypto.randomBytes(16);
+  // Create a new cipher using the algorithm, key, and iv
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  // Create the new (encrypted) buffer
+  const result = Buffer.concat([iv, cipher.update(buffer), cipher.final()]);
+  return result;
 };
 
 module.exports = {
