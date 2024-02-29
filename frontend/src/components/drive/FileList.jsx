@@ -9,14 +9,6 @@ const FileList = ({ filesProperties, handleDownload }) => {
   const MB_CONVERSION = 1000000;
   const KB_CONVERSION = 1000;
 
-  const calculateVolume = (fileProperties) => {
-    let totalSizeGB = 0;
-    for (const fileProperty of fileProperties) {
-      totalSizeGB += fileProperty.size / (1024 * 1024 * 1024); // Convert bytes to GB as we sum up
-    }
-    return totalSizeGB.toFixed(2) + " GB";
-  };
-
   const convertSize = (size) => {
     let fileSize;
     if (size >= GB_CONVERSION) {
@@ -57,16 +49,6 @@ const FileList = ({ filesProperties, handleDownload }) => {
 
   return (
     <div className="file-list-container">
-      <div>
-        <h2 className="file-list-title">Uploaded Files</h2>
-        <span className="total-files">
-          Total files: {filesProperties.length}
-        </span>
-        <span className="total-files">
-          Uploaded volume: {calculateVolume(filesProperties)}
-        </span>
-      </div>
-
       <table className="file-list-table">
         <thead>
           <tr>

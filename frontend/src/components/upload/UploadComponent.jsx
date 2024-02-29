@@ -4,6 +4,7 @@ import "./UploadComponent.css";
 import axios from "../../api/axiosConfig"; // Import Axios for making HTTP requests
 
 const UploadComponent = () => {
+  const [password, setPassword] = useState(""); // State to hold the password value
   const [files, setFiles] = useState([]);
   const [totalFiles, setTotalFiles] = useState(0);
   const [uploadProgress, setUploadProgress] = useState([]);
@@ -67,6 +68,9 @@ const UploadComponent = () => {
       formData.append("files", file.file);
     });
 
+    // Include password as query parameter
+    const queryParams = { password };
+
     const progressBars = files.map(() => ({
       progress: 0,
     }));
@@ -77,6 +81,7 @@ const UploadComponent = () => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        params: queryParams, // Pass password as query parameter
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
           const progress = Math.round((loaded / total) * 100);
@@ -88,6 +93,9 @@ const UploadComponent = () => {
           );
         },
       });
+      if (response.status === 400 || response.status == 500)
+        alert(response.data.message);
+
       console.log(response.data);
       setFiles([]);
       setTotalFiles(0);
@@ -105,12 +113,22 @@ const UploadComponent = () => {
     }
   };
 
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
   return (
     <div>
       <label htmlFor="upload" className="upload-container">
         <span>Choose files</span>
       </label>
       <span className="total-files">Total files: {totalFiles}</span>
+      <input
+        type="password"
+        value={password}
+        onChange={handlePasswordChange}
+        placeholder="Enter password"
+      />
       <input
         id="upload"
         type="file"
