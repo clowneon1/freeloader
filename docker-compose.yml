@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  freeloader-f:
+    image: freeloader-f
+    ports:
+      - "8080:8080"
+    networks:
+      - freeloader-network
+
+  freeloader-b:
+    image: freeloader-b
+    ports:
+      - "3000:3000"
+
+    networks:
+      - freeloader-network
+
+networks:
+  freeloader-network:
+    driver: bridge
