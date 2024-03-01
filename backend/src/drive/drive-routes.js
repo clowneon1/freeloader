@@ -11,6 +11,9 @@ router.get("/drive", driveController.getFilesProperties);
 
 const path = require("path");
 
+//delete
+router.delete("/delete/:id", driveController.deleteFile);
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadFolder = path.join(__dirname, "/uploads");
