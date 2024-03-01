@@ -5,7 +5,6 @@ import axios from "../../api/axiosConfig";
 
 const DriveComponent = () => {
   const [filesProperties, setFilesProperties] = useState([]);
-  const [password, setPassword] = useState("");
 
   useEffect(() => {
     getAllFilesProperties();
@@ -18,11 +17,9 @@ const DriveComponent = () => {
   };
 
   const handleDownload = async (fileProperties) => {
-    const queryParams = { password };
     try {
       const response = await axios.get(`/download/${fileProperties._id}`, {
         responseType: "blob",
-        params: queryParams,
       });
       if (response.status === 400 || response.status == 500)
         alert(response.data.message);
@@ -57,12 +54,6 @@ const DriveComponent = () => {
     <div className="drive-container">
       <div>
         <h2 className="file-list-title">Uploaded Files</h2>
-        <input
-          type="password"
-          value={password}
-          onChange={handlePasswordChange}
-          placeholder="Enter password"
-        />
         <span className="total-files">
           Total files: {filesProperties.length}
         </span>

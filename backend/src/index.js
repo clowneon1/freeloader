@@ -17,6 +17,7 @@ app.use(express.json()); // Middleware for parsing JSON
 app.use(cors());
 app.use("/", driveRouter);
 app.use(errorHandler.routeNotFound);
+app.use(errorHandler.errorResponse);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
