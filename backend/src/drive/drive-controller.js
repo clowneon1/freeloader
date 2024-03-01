@@ -77,7 +77,7 @@ const upload = async (req, res) => {
       // Assuming you have a function to send file to Discord bot named 'sendFileToDiscordBot'
       // console.log(`${file.size} \ ${file.filename}`);
 
-      let filePath = file.destination + "\\" + file.filename;
+      let filePath = file.destination + "/" + file.filename;
       console.log(`${filePath} is processing right now`);
       freeloader
         .uploadFileInChunksAndDelete(
